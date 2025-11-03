@@ -10,11 +10,9 @@ public class OptionsManager : MonoBehaviour
 
     void Start()
     {
-        // Inicializa sliders con valores actuales
-        sensibilidadSlider.value = mouseLookScript.mouseSensitivity;
+        sensibilidadSlider.value = 120;
         volumenSlider.value = AudioListener.volume;
 
-        // Asigna listeners para que se actualicen al mover el slider
         sensibilidadSlider.onValueChanged.AddListener(SetSensibilidad);
         volumenSlider.onValueChanged.AddListener(SetVolumen);
     }
