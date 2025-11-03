@@ -7,10 +7,24 @@ public class MainMenuManager : MonoBehaviour
     public GameObject optionsCanvas;
     public GameObject controlesCanvas;
 
+    public void Start()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        optionsCanvas.SetActive(false);
+        controlesCanvas.SetActive(false);
+        mainMenuCanvas.SetActive(true);
+    }
     public void PlayGame()
     {
-        SceneManager.LoadScene("NombreDeTuEscena"); 
-    }
+        Time.timeScale = 1f; 
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        SceneManager.LoadScene("Hotel");
+    } 
+
 
     public void OpenOptions()
     {
@@ -31,4 +45,5 @@ public class MainMenuManager : MonoBehaviour
         mainMenuCanvas.SetActive(true);
     }
 }
+
 

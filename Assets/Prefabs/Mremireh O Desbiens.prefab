@@ -179,7 +179,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.77514124
+      value: 194.2693
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -187,7 +187,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.6535358
+      value: -120.7394
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -244,6 +244,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6866377232861509800}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9187255629221477970}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7827119170355261869}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7049040178121542775}
   m_SourcePrefab: {fileID: 100100000, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}
 --- !u!1 &1569657059865451962 stripped
 GameObject:
@@ -287,7 +296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac43b84cfc944364cb2a5d3bee5e8c39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MouseLook
-  mouseSensitivity: 100
+  mouseSensitivity: 120
   playerBody: {fileID: 2198700458875717376}
   cameraTransform: {fileID: 266784373668587925}
 --- !u!114 &604364234252512121
@@ -303,13 +312,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   controller: {fileID: 0}
-  speed: 5
-  sprintSpeed: 8
-  gravity: -9.8
-  jump: 3.2
+  speed: 6
+  sprintSpeed: 7
+  gravity: -14
+  jump: 1.4
   doubleJump: 1.2
-  doubleTap: 0.2
-  dashSpeed: 10
+  doubleTap: 0.4
+  dashSpeed: 9
   dashDuration: 0.8
 --- !u!114 &6866377232861509800
 MonoBehaviour:
@@ -325,6 +334,56 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InteractionScript
   distancia: 2
   playerCamera: {fileID: 983909079839170388}
+--- !u!65 &9187255629221477970
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569657059865451962}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2.1, z: 1}
+  m_Center: {x: 0, y: 1.1, z: 0}
+--- !u!114 &7827119170355261869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569657059865451962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: facaf8af133687449b305107cb12e391, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseManager
+  pauseMenuUI: {fileID: 0}
+  menuCanvas: {fileID: 0}
+--- !u!114 &7049040178121542775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569657059865451962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be36690cff9fbb4d827420892faad58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OptionsManager
+  sensibilidadSlider: {fileID: 0}
+  volumenSlider: {fileID: 0}
+  mouseLookScript: {fileID: 6342710296313080636}
 --- !u!4 &2198700458875717376 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 99c073e95e1526f41a484d1fdade590a, type: 3}

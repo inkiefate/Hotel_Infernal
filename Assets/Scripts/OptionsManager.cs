@@ -20,10 +20,13 @@ public class OptionsManager : MonoBehaviour
     public void SetSensibilidad(float value)
     {
         mouseLookScript.mouseSensitivity = value;
+        PlayerPrefs.SetFloat("Sensibilidad", value);
     }
 
     public void SetVolumen(float value)
     {
         AudioListener.volume = value;
+        PlayerPrefs.SetFloat("Volumen", value);
     }
+
 }

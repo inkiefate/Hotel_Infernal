@@ -11,6 +11,11 @@ public class MouseLook : MonoBehaviour
     void Start()
     {
         playerBody = transform;
+
+        if (PlayerPrefs.HasKey("Sensibilidad"))
+        {
+            mouseSensitivity = PlayerPrefs.GetFloat("Sensibilidad");
+        }
     }
 
     void Update()

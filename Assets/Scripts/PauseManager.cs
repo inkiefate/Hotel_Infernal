@@ -49,6 +49,8 @@ public class PauseManager : MonoBehaviour
 
     public void OpenOptions()
     {
+        Cursor.lockState = CursorLockMode.None;  
+        Cursor.visible = true;
         pauseMenuUI.SetActive(false);     
         menuCanvas.SetActive(true);     
     }
@@ -57,6 +59,15 @@ public class PauseManager : MonoBehaviour
     {
         menuCanvas.SetActive(false);     // Oculta el menú de opciones
         pauseMenuUI.SetActive(true);     // Muestra el menú de pausa
+    }
+
+    public void backToMainMenu()
+    {
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.None; 
+        Cursor.visible = true;
+        SceneManager.LoadScene("MainMenuControlador");
+
     }
 
 }
