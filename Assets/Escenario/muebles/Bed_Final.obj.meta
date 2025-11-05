@@ -3,10 +3,45 @@ guid: 543f173c26ed84748a841fe781d096ae
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bed_Bed_quilt_02_low_Group61410Mat
+    second: {fileID: 2100000, guid: 04a6dd0b1d0423542aaf37e97a47c4ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bed_pCube57Mat
+    second: {fileID: 2100000, guid: bf43eeac06ee02f4a8a15f48d015a80c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bed_polySurface75Mat
+    second: {fileID: 2100000, guid: a86b98b60c771654d99333a0f8f12e5e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bed_polySurface78Mat
+    second: {fileID: 2100000, guid: ff79e566b8bf4304e86f66341a08aaeb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bed_polySurface79Mat
+    second: {fileID: 2100000, guid: 41a7375a001e6944b9146ff6a29b555e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bed_polySurface80Mat
+    second: {fileID: 2100000, guid: 59e385f967c0a4246a55f080cd76fed0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: polySurface112_bedMat
+    second: {fileID: 2100000, guid: d7398a76420821f47b593966bc6264aa, type: 2}
   materials:
     materialImportMode: 2
-    materialName: 0
+    materialName: 1
     materialSearch: 1
     materialLocation: 1
   animations:
