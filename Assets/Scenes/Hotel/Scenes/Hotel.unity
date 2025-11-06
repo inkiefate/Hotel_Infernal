@@ -3744,6 +3744,10 @@ PrefabInstance:
       propertyPath: m_Center.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1721548742757311601, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7031659522165209937, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
       propertyPath: m_Name
       value: CleanableObject (2)
@@ -5644,6 +5648,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1721548742757311601, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
       propertyPath: m_Center.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1721548742757311601, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7031659522165209937, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
@@ -10751,6 +10759,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bio Hound Game Ready
       objectReference: {fileID: 0}
+    - target: {fileID: 5132575936992809652, guid: f3b9d6f157f12e547af46da3c74c0d38, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5363901585466013808, guid: f3b9d6f157f12e547af46da3c74c0d38, type: 3}
       propertyPath: m_LocalScale.x
       value: 50
@@ -10927,6 +10939,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 955826626979425930, guid: 86073e57c96407846a8d770150fd945b, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 966258224919012262, guid: 86073e57c96407846a8d770150fd945b, type: 3}
       propertyPath: m_LocalScale.x
       value: 5
@@ -13922,6 +13938,10 @@ PrefabInstance:
       propertyPath: m_Center.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1721548742757311601, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7031659522165209937, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
       propertyPath: m_Name
       value: CleanableObject (1)
@@ -13940,7 +13960,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7656678335010936353, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4
+      value: -0.4
       objectReference: {fileID: 0}
     - target: {fileID: 7656678335010936353, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
       propertyPath: m_LocalPosition.z
@@ -14241,10 +14261,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1073748559610356462, guid: 6e1ba69bfdc69eb46a5814b6d044b65d, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1683600062077155201, guid: 6e1ba69bfdc69eb46a5814b6d044b65d, type: 3}
       propertyPath: jugador
       value: 
       objectReference: {fileID: 1103801430}
+    - target: {fileID: 1683600062077155201, guid: 6e1ba69bfdc69eb46a5814b6d044b65d, type: 3}
+      propertyPath: distanciaMinima
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 1683600062077155201, guid: 6e1ba69bfdc69eb46a5814b6d044b65d, type: 3}
       propertyPath: interfazGameOver
       value: 
@@ -14979,6 +15007,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1721548742757311601, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
       propertyPath: m_Center.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1721548742757311601, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7031659522165209937, guid: 437131776444c8c4192a7470bc4f5092, type: 3}
