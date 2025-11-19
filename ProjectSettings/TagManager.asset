@@ -10,7 +10,8 @@ TagManager:
   - Cleanable
   - Toalla
   - EntregaToalla
-  - Demonio3
+  - Enemy2
+  - EntregaToallaWrong
   layers:
   - Default
   - TransparentFX
