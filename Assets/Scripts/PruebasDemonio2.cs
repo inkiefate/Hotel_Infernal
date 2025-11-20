@@ -1,3 +1,5 @@
+//ESTE SCRIPT ES PARA PRUEBAS, SE TIENE QUE BORRAR MAS ADELANTE
+
 using UnityEngine;
 
 public class PruebasDemonio2 : MonoBehaviour
@@ -17,7 +19,7 @@ public class PruebasDemonio2 : MonoBehaviour
 
     void Update()
     {
-        // Detectar si el jugador está mirando a la toalla
+        // Detectar si el jugador estï¿½ mirando a la toalla
         if (!recogida && DetectarToalla() && Input.GetKeyDown(KeyCode.E))
         {
             recogida = true;
@@ -52,7 +54,7 @@ public class PruebasDemonio2 : MonoBehaviour
                             Instantiate(toallaVisualPrefab, puntoColocacion.position + offset, puntoColocacion.rotation);
                         }
 
-                        Debug.Log("Toalla entregada y colocada en el baño");
+                        Debug.Log("Toalla entregada y colocada en el baï¿½o");
                     }
                 }
                 if (hit.CompareTag("EntregaToallaWrong"))

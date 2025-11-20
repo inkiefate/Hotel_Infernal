@@ -3,16 +3,18 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+// Controla la pantalla de Game Over usando textos TMP y una imagen de fondo
 public class GameOverUITMP : MonoBehaviour
 {
-    public TextMeshProUGUI gameOverText;
-    public Image fondoNegro;
-    public TextMeshProUGUI reiniciarTexto;
+    public TextMeshProUGUI gameOverText;   // Texto principal de "Game Over"
+    public Image fondoNegro;               // Imagen oscura detrás del texto
+    public TextMeshProUGUI reiniciarTexto; // Texto que indica cómo reiniciar
 
-    private bool mostrarGameOver = false;
+    private bool mostrarGameOver = false;  // Controla si el estado de Game Over está activo
 
     void Start()
     {
+        // Ocultar todos los elementos al inicio
         gameOverText.enabled = false;
         fondoNegro.enabled = false;
         reiniciarTexto.enabled = false;
@@ -20,21 +22,22 @@ public class GameOverUITMP : MonoBehaviour
 
     void Update()
     {
+        // Permitir reiniciar la escena solo si Game Over ya está mostrado
         if (mostrarGameOver && Input.GetKeyDown(KeyCode.U))
         {
-            Time.timeScale = 1f; 
+            Time.timeScale = 1f; // Reactivar el tiempo antes de reiniciar
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 
+    // Activa la interfaz de Game Over
     public void ShowGameOverMessage()
     {
-        gameOverText.enabled = true;
-        fondoNegro.enabled = true;
-        reiniciarTexto.enabled = true;
-        mostrarGameOver = true;
-        Time.timeScale = 0f;
+        gameOverText.enabled = true;   // Muestra el texto principal
+        fondoNegro.enabled = true;     // Muestra el fondo negro
+        reiniciarTexto.enabled = true; // Muestra el mensaje de reinicio
+        mostrarGameOver = true;        // Cambia el estado
+
+        Time.timeScale = 0f;           // Pausa el juego completo
     }
 }
-
-

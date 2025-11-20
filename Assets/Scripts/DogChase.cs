@@ -1,58 +1,75 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+// Script que controla el comportamiento de un perro que persigue al jugador según un temporizador
 public class DogChase : MonoBehaviour
 {
-    public Transform player;
-    private DogTimer timerScript;
-    private NavMeshAgent agent;
-    public GameOverUITMP gameOverUI;
-    private Quaternion initialRotation;
+    public Transform player;                 // Referencia al jugador
+    private DogTimer timerScript;            // Script del temporizador del perro
+    private NavMeshAgent agent;              // Agente de navegación
+    public GameOverUITMP gameOverUI;         // UI de Game Over
+    private Quaternion initialRotation;       // Rotación inicial para cuando no persigue
 
-    public float interactionDistance = 2f;
-    private bool isPlayerNearby = false;
-    private bool hasInteracted = false;
+    public float interactionDistance = 2f;    // Distancia para permitir interacción
+    private bool isPlayerNearby = false;      // Si el jugador está lo suficientemente cerca
+    private bool hasInteracted = false;       // Para saber si el jugador ya interactuó
 
     void Start()
     {
+        // Obtener referencias necesarias
         timerScript = GetComponent<DogTimer>();
         agent = GetComponent<NavMeshAgent>();
+
+        // Suscripción al evento de que el temporizador acabe
         timerScript.OnTimerExpired += OnTimerExpired;
+
+        // Guardar rotación inicial
         initialRotation = transform.rotation;
     }
 
     void Update()
     {
+        // Calcular distancia al jugador
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         isPlayerNearby = distanceToPlayer <= interactionDistance;
 
+        // Si no persigue, mantener la rotación inicial
         if (!timerScript.isChasing)
         {
             transform.rotation = initialRotation;
         }
 
+        // Si el jugador está cerca y presiona la tecla E, y todavía no persigue
         if (isPlayerNearby && Input.GetKeyDown(KeyCode.E) && !timerScript.isChasing)
         {
             hasInteracted = true;
             Debug.Log("Interacción realizada");
         }
 
+        // Si el perro está persiguiendo
         if (timerScript.isChasing && player != null)
         {
+            // Actualizar destino del agente
             agent.SetDestination(player.position);
 
+            // Ajustar rotación para que mire hacia la dirección en que se mueve
             Vector3 direction = agent.velocity.normalized;
             if (direction != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
-                Quaternion correction = Quaternion.Euler(-90f, 10f, transform.rotation.eulerAngles.z); // Ajusta según tu modelo
+
+                // Corrección manual de rotación según la orientación del modelo 3D
+                Quaternion correction = Quaternion.Euler(-90f, 10f, transform.rotation.eulerAngles.z);
+
                 transform.rotation = targetRotation * correction;
             }
         }
     }
 
+    // Se llama cuando el temporizador llega a cero
     void OnTimerExpired()
     {
+        // Si el jugador interactuó, reiniciar el temporizador
         if (hasInteracted)
         {
             hasInteracted = false;
@@ -61,11 +78,13 @@ public class DogChase : MonoBehaviour
         }
         else
         {
+            // Si no interactuó, el perro empieza a perseguir
             timerScript.isChasing = true;
             Debug.Log("¡El enemigo comienza la persecución!");
         }
     }
 
+    // Cuando el perro colisiona con el jugador
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && timerScript.isChasing)
@@ -79,11 +98,13 @@ public class DogChase : MonoBehaviour
         }
     }
 
-
+    // Mostrar interacción y temporizador en pantalla
     void OnGUI()
     {
+        // No mostrar nada si el juego está pausado
         if (Time.timeScale == 0f) return;
 
+        // Mensaje para interactuar si el jugador está cerca y el perro no persigue
         if (isPlayerNearby && !timerScript.isChasing)
         {
             GUIStyle style = new GUIStyle(GUI.skin.label);
@@ -95,6 +116,7 @@ public class DogChase : MonoBehaviour
             GUI.Label(rect, "Presiona E para interactuar", style);
         }
 
+        // Mostrar temporizador mientras el perro no persigue
         if (!timerScript.isChasing)
         {
             GUIStyle timerStyle = new GUIStyle(GUI.skin.label);
