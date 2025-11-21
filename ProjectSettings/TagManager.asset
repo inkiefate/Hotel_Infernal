@@ -14,6 +14,7 @@ TagManager:
   - EntregaToallaWrong
   - "Ba\xF1era"
   - Contenedor
+  - Telefono
   layers:
   - Default
   - TransparentFX
