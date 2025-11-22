@@ -76,7 +76,7 @@ public class TelefonoInteract : MonoBehaviour
     }
 
     // Método auxiliar para cerrar el canvas y volver a bloquear el cursor
-    void CerrarCanvas()
+    public void CerrarCanvas()
     {
         canvasTelefono.SetActive(false);
         abierto = false;

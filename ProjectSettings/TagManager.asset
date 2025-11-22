@@ -15,6 +15,7 @@ TagManager:
   - "Ba\xF1era"
   - Contenedor
   - Telefono
+  - Termometro
   layers:
   - Default
   - TransparentFX

@@ -2,81 +2,96 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
-// Comportamiento alternativo del demonio con persecución temporal y rotación hacia el jugador
+// Demonio que rota hacia el jugador y persigue con precision cuando esta enfadado
 public class DemonBehaviour2 : MonoBehaviour
 {
-    // Referencia al jugador
+    // Referencias
     public Transform jugador;
-
-    // Velocidad a la que el demonio rota para mirar al jugador
-    public float velocidadRotacion = 3f;
-
-    // Interfaz de Game Over
     public GameOverUITMP interfazGameOver;
+    public TelefonoInteract telefono;
 
-    // NavMeshAgent para mover al demonio
+    // Rotacion
+    public float velocidadRotacion = 6f; // rotacion mas rapida para apuntar al jugador
+
+    // NavMesh
     private NavMeshAgent agente;
 
-    // Indica si el demonio está en modo persecución
+    // Estado
     private bool enfadado = false;
-
-    // Punto inicial al que regresará al calmarse
     private Vector3 puntoOrigen;
+
+    // Parametros de captura
+    public float distanciaMatar = 0.6f; // distancia exacta para matar
 
     void Start()
     {
-        // Obtiene el NavMeshAgent y configura valores iniciales
         agente = GetComponent<NavMeshAgent>();
         if (agente != null)
         {
-            agente.isStopped = true;        // No se mueve al inicio
-            agente.stoppingDistance = 0f;   // Puede acercarse completamente al jugador
-            agente.autoBraking = false;     // Evita desaceleración automática
-            agente.updateRotation = true;   // Permite al agente rotar automáticamente
+            // Configuracion para parada precisa en el objetivo
+            agente.isStopped = true;           // inicia quieto
+            agente.stoppingDistance = 0.5f;    // margen para no atravesar al jugador
+            agente.autoBraking = true;         // imprescindible para frenar en el destino
+            agente.updateRotation = false;     // rotacion manual para mayor control
+            agente.updatePosition = true;      // que el agente actualice su posicion
+            agente.acceleration = 100f;        // respuesta inmediata
+            agente.angularSpeed = 720f;        // giros rapidos
+            agente.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
         }
 
-        // Guarda la posición inicial para volver después
         puntoOrigen = transform.position;
     }
 
     void Update()
     {
-        if (jugador != null)
-        {
-            // Calcula dirección hacia el jugador sin inclinar el demonio verticalmente
-            Vector3 direccion = jugador.position - transform.position;
-            direccion.y = 0;
+        if (jugador == null || agente == null) return;
 
-            // Rota suavemente hacia el jugador
-            if (direccion != Vector3.zero)
+        // Rotar siempre hacia el jugador
+        Vector3 dir = jugador.position - transform.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude > 0.0001f)
+        {
+            Quaternion rotObjetivo = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotObjetivo, velocidadRotacion * 90f * Time.deltaTime);
+        }
+
+        // Perseguir con recalculo continuo del destino
+        if (enfadado)
+        {
+            agente.isStopped = false;
+            agente.speed = 25f;                    // velocidad alta solicitada
+            agente.SetDestination(jugador.position); // actualiza destino cada frame
+
+            // Si esta dentro de la distancia de matar, activa GameOver
+            float dist = Vector3.Distance(transform.position, jugador.position);
+            if (dist <= distanciaMatar)
             {
-                Quaternion rotacionObjetivo = Quaternion.LookRotation(direccion);
-                transform.rotation = Quaternion.Slerp(transform.rotation, rotacionObjetivo, velocidadRotacion * Time.deltaTime);
+                ActivarGameOver();
+                return;
             }
 
-            // Si el demonio está enfadado, activa movimiento hacia el jugador
-            if (enfadado && agente != null)
+            // Si ya alcanzo el stoppingDistance, frena para no pasarse
+            if (dist <= agente.stoppingDistance + 0.05f)
             {
-                agente.isStopped = false;
-                agente.SetDestination(jugador.position);
+                agente.isStopped = true; // detener en el borde
             }
         }
     }
 
-    // Activa persecución muy rápida durante un tiempo limitado
+    // Activa persecucion rapida durante un tiempo limitado
     public void ActivarPersecucionRapida()
     {
         if (agente != null && jugador != null)
         {
-            agente.speed = 25f;   // Velocidad muy alta
             enfadado = true;
+            agente.isStopped = false;
+            agente.speed = 25f;
 
-            // Después de 10 segundos se calma automáticamente
+            // Opcional: calma despues de 10 segundos
             StartCoroutine(CalmarDespuesDeTiempo(10f));
         }
     }
 
-    // Corrutina que calma al demonio después de cierto tiempo
     private IEnumerator CalmarDespuesDeTiempo(float segundos)
     {
         yield return new WaitForSeconds(segundos);
@@ -85,22 +100,40 @@ public class DemonBehaviour2 : MonoBehaviour
 
         if (agente != null)
         {
-            agente.speed = 5f;         // Velocidad normal
-            agente.isStopped = false;  // Puede moverse
-            agente.SetDestination(puntoOrigen); // Regresa a su punto inicial
+            agente.speed = 5f;              // velocidad normal
+            agente.isStopped = false;
+            agente.autoBraking = true;      // mantener frenado en destino
+            agente.SetDestination(puntoOrigen);
         }
     }
 
-    // Detecta si el demonio enfadado golpea al jugador
+    // Kill adicional por trigger si tienes collider con isTrigger
     void OnTriggerEnter(Collider other)
     {
         if (enfadado && other.CompareTag("Player"))
         {
-            if (interfazGameOver != null)
-            {
-                interfazGameOver.ShowGameOverMessage();
-                Time.timeScale = 0f; // Pausa el juego
-            }
+            ActivarGameOver();
+        }
+    }
+
+    // Lanza GameOver y cierra el telefono si estaba abierto
+    void ActivarGameOver()
+    {
+        // Cerrar canvas del telefono si estaba abierto
+        if (telefono != null)
+        {
+            telefono.CerrarCanvas();
+        }
+
+        if (interfazGameOver != null)
+        {
+            interfazGameOver.ShowGameOverMessage();
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            Debug.LogWarning("Interfaz Game Over no asignada en DemonBehaviour2.");
         }
     }
 }
+
