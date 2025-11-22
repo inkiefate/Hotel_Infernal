@@ -66,7 +66,7 @@ public class TermometroInteract : MonoBehaviour
         textoTemperatura.text = valor.ToString("F1") + " °C";
     }
 
-    void ValidarTemperatura()
+    public void ValidarTemperatura()
     {
         float valor = sliderTemperatura.value;
 
