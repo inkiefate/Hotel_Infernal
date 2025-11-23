@@ -72,7 +72,7 @@ public class PatitoPickup : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(playerMovement.transform.position, 2f);
         foreach (Collider hit in hits)
         {
-            if (hit.CompareTag("Baño") || hit.CompareTag("Bañera"))
+            if (hit.CompareTag("Bañera") || hit.CompareTag("Bañera"))
                 return true;
         }
         return false;
