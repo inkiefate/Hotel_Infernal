@@ -103,7 +103,7 @@ public class CleanerManager : MonoBehaviour
             estilo.normal.textColor = Color.white;
             estilo.alignment = TextAnchor.MiddleCenter;
             Rect mensaje = new Rect(Screen.width / 2 - 200, Screen.height - 120, 400, 80);
-            GUI.Label(mensaje, "Pulsa E para limpiar cubo", estilo);
+            GUI.Label(mensaje, "Pulsa E para interaccionar", estilo);
         }
     }
 }

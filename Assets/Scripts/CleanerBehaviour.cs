@@ -6,6 +6,7 @@ public class CleanerBehavior : MonoBehaviour
     // Referencia al componente Renderer para cambiar el color del objeto
     private Renderer rend;
 
+    public Material materialSucio;
     void Start()
     {
         // Obtiene el Renderer del objeto al iniciar
@@ -13,14 +14,14 @@ public class CleanerBehavior : MonoBehaviour
 
         // Si el Renderer existe, cambia el color del material a verde
         if (rend != null)
-            rend.material.color = Color.green;
+            rend.material = materialSucio;
     }
 
     void OnEnable()
     {
         // Cada vez que el objeto se habilita, vuelve a poner el color verde
         if (rend != null)
-            rend.material.color = Color.green;
+            rend.material = materialSucio;
     }
 
     void OnDisable()
