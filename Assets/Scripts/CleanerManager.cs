@@ -40,7 +40,7 @@ public class CleanerManager : MonoBehaviour
 
         // Detectar cubo con raycast
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 2f))
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 4f))
         {
             if (hit.collider.CompareTag("Cleanable"))
             {

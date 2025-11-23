@@ -24,7 +24,7 @@ public class FrameTaskManager : MonoBehaviour
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 2f))
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 4f))
         {
             FrameBehavior frame = hit.collider.GetComponent<FrameBehavior>();
             if (frame != null && !frame.EstaRecto)

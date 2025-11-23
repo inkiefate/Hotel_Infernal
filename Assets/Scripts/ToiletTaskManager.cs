@@ -28,7 +28,7 @@ public class ToiletTaskManager : MonoBehaviour
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 2f))
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 4f))
         {
             ToiletBehavior toilet = hit.collider.GetComponent<ToiletBehavior>();
             if (toilet != null && !toilet.EstaLimpio)

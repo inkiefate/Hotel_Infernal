@@ -27,7 +27,7 @@ public class BedTaskManager : MonoBehaviour
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 2f))
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 4f))
         {
             BedObjectBehavior obj = hit.collider.GetComponent<BedObjectBehavior>();
             if (obj != null && !obj.EstaCompletado)

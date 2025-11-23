@@ -24,7 +24,7 @@ public class LampTaskManager : MonoBehaviour
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 2f))
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 4f))
         {
             LampBehavior lamp = hit.collider.GetComponent<LampBehavior>();
             if (lamp != null && !lamp.EstaEncendida)
