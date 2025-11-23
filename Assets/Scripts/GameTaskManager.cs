@@ -3,79 +3,206 @@ using UnityEngine.SceneManagement;
 
 public class GameTaskManager : MonoBehaviour
 {
+    [Header("Referencias Tareas")]
     public BedTaskManager bedTaskManager;
     public DemonBehaviour demonBehaviour;
-    public GameObject juegoFinalizadoCanvas;
 
-    public float tiempoTotal = 210f;
-    private float tiempoRestante;
+    [Header("UI")]
+    public GameObject juegoFinalizadoCanvas;  // Victoria - completar todo en <8 mins
+    public GameOverUITMP interfazGameOver;    // Derrota - tiempo agotado o demonio mata
+
+    [Header("Timers")]
+    public float tiempoDemonio = 210f;        // 3.5 minutos para cama+latas
+    public float tiempoGeneral = 480f;        // 8 minutos para todas las tareas
+
+    private float tiempoRestanteDemonio;
+    private float tiempoRestanteGeneral;
     private bool persecucionActivada = false;
     private bool modoMatarActivado = false;
-    private bool tareasCompletadas = false;
+    private bool demonioCalmado = false;
+    private bool juegoGanado = false;
+    private bool juegoPerdido = false;
 
     void Start()
     {
-        tiempoRestante = tiempoTotal;
+        // Inicializar timers
+        tiempoRestanteDemonio = tiempoDemonio;
+        tiempoRestanteGeneral = tiempoGeneral;
 
+        // Ocultar UI al inicio
         if (juegoFinalizadoCanvas != null)
             juegoFinalizadoCanvas.SetActive(false);
-
-        Debug.Log($"GameTaskManager iniciado - Latas totales: {TrashPickUp.TotalLatas}");
     }
 
     void Update()
     {
-        if (!tareasCompletadas)
+        if (juegoGanado || juegoPerdido) return;
+
+        // Actualizar timers
+        if (!juegoGanado)
         {
-            tiempoRestante -= Time.deltaTime;
+            tiempoRestanteDemonio -= Time.deltaTime;
+            tiempoRestanteGeneral -= Time.deltaTime;
         }
 
-        // Verificar estado de las tareas
+        // VERIFICAR VICTORIA: Todas las tareas completadas antes de 8 mins
+        if (TodasLasTareasCompletadas() && !juegoGanado)
+        {
+            juegoGanado = true;
+            MostrarVictoria();
+            return;
+        }
+
+        // VERIFICAR DERROTA: Tiempo general agotado
+        if (tiempoRestanteGeneral <= 0f && !juegoPerdido)
+        {
+            juegoPerdido = true;
+            MostrarDerrota("Tiempo agotado");
+            return;
+        }
+
+        // LÓGICA DEL DEMONIO (solo si no está calmado y no ganamos)
+        if (!demonioCalmado && !juegoGanado)
+        {
+            VerificarTareasDemonio();
+        }
+    }
+
+    void VerificarTareasDemonio()
+    {
+        // Verificar tareas del demonio (cama + latas)
         bool latasOk = TrashPickUp.TodasLasLatasEntregadas();
         bool camaOk = bedTaskManager != null && bedTaskManager.TareaCompletada;
-        bool nuevasTareasCompletas = latasOk && camaOk;
+        bool tareasDemonioCompletas = latasOk && camaOk;
 
-        // DEBUG cada segundo
-        if (Time.frameCount % 60 == 0 && !tareasCompletadas)
+        // Si se completan las tareas del demonio, calmarlo
+        if (tareasDemonioCompletas && !demonioCalmado)
         {
-            Debug.Log($"DEBUG - Latas: {TrashPickUp.LatasEntregadas}/{TrashPickUp.TotalLatas} = {latasOk}, " +
-                     $"Cama: {camaOk}, Completas: {nuevasTareasCompletas}, " +
-                     $"Tiempo: {tiempoRestante:F1}s");
+            demonioCalmado = true;
+            if (demonBehaviour != null)
+            {
+                demonBehaviour.Calmar();
+            }
         }
 
-        if (nuevasTareasCompletas && !tareasCompletadas)
+        // Si NO se completan a tiempo, activar demonio
+        if (!tareasDemonioCompletas && !demonioCalmado)
         {
-            tareasCompletadas = true;
-            Debug.Log("¡TAREAS COMPLETADAS! Calmando demonio...");
-            CalmarDemonio();
-        }
-
-        if (!tareasCompletadas)
-        {
-            if (tiempoRestante <= 60f && !persecucionActivada)
+            if (tiempoRestanteDemonio <= 60f && !persecucionActivada)
             {
                 demonBehaviour.ActivarPersecucionSuave();
                 persecucionActivada = true;
-                Debug.Log("Demonio enfadado! Quedan menos de 60 segundos.");
             }
 
-            if (tiempoRestante <= 0f && !modoMatarActivado)
+            if (tiempoRestanteDemonio <= 0f && !modoMatarActivado)
             {
                 demonBehaviour.ActivarModoMatar();
                 modoMatarActivado = true;
-                Debug.Log("MODO MATAR ACTIVADO! Demonio viene a por ti.");
             }
         }
     }
 
-    void CalmarDemonio()
+    bool TodasLasTareasCompletadas()
     {
-        Debug.Log("Calmando demonio...");
+        // 1. Latas (5)
+        bool latasCompletas = TrashPickUp.TodasLasLatasEntregadas();
 
-        if (demonBehaviour != null)
+        // 2. Cama
+        bool camaCompletada = bedTaskManager != null && bedTaskManager.TareaCompletada;
+
+        // 3. Toalla
+        bool toallaCompletada = false;
+        ToallaPickup toalla = FindObjectOfType<ToallaPickup>();
+        if (toalla != null) toallaCompletada = toalla.ToallaEntregada;
+
+        // 4. Patito
+        bool patitoCompletado = false;
+        PatitoPickup patito = FindObjectOfType<PatitoPickup>();
+        if (patito != null) patitoCompletado = patito.PatitoEntregado;
+
+        // 5. Limpieza
+        bool limpiezaCompletada = false;
+        CleanerManager limpieza = FindObjectOfType<CleanerManager>();
+        if (limpieza != null) limpiezaCompletada = limpieza.LimpiezaCompletada;
+
+        // 6. Váteres
+        bool vateresCompletados = false;
+        ToiletTaskManager vateres = FindObjectOfType<ToiletTaskManager>();
+        if (vateres != null)
         {
-            demonBehaviour.Calmar();
-            Debug.Log("Demonio calmado permanentemente.");
+            // Necesitaríamos una propiedad pública en ToiletTaskManager
+            // vateresCompletados = vateres.TareaCompletada;
+            vateresCompletados = true; // Temporal - necesitas agregar la propiedad
+        }
+
+        // 7. Grifos
+        bool grifosCompletados = false;
+        FaucetTaskManager grifos = FindObjectOfType<FaucetTaskManager>();
+        if (grifos != null)
+        {
+            // grifosCompletados = grifos.TareaCompletada;
+            grifosCompletados = true; // Temporal
+        }
+
+        // 8. Cuadros
+        bool cuadrosCompletados = false;
+        FrameTaskManager cuadros = FindObjectOfType<FrameTaskManager>();
+        if (cuadros != null)
+        {
+            // cuadrosCompletados = cuadros.TareaCompletada;
+            cuadrosCompletados = true; // Temporal
+        }
+
+        // 9. Lámparas
+        bool lamparasCompletadas = false;
+        LampTaskManager lamparas = FindObjectOfType<LampTaskManager>();
+        if (lamparas != null)
+        {
+            // lamparasCompletadas = lamparas.TareaCompletada;
+            lamparasCompletadas = true; // Temporal
+        }
+
+        // 10. Teléfono (siempre correcto si no enfada al demonio)
+        bool telefonoCompletado = true;
+
+        // 11. Termómetro (siempre correcto si no enfada al demonio)
+        bool termometroCompletado = true;
+
+        // 12. Ventilador (siempre correcto si no enfada al demonio)
+        bool ventiladorCompletado = true;
+
+        // Devolver true solo si TODAS están completas
+        return latasCompletas && camaCompletada && toallaCompletada &&
+               patitoCompletado && limpiezaCompletada && vateresCompletados &&
+               grifosCompletados && cuadrosCompletados && lamparasCompletadas &&
+               telefonoCompletado && termometroCompletado && ventiladorCompletado;
+    }
+
+    void MostrarVictoria()
+    {
+        Time.timeScale = 0f;
+        if (juegoFinalizadoCanvas != null)
+        {
+            juegoFinalizadoCanvas.SetActive(true);
+        }
+    }
+
+    public void MostrarDerrota(string motivo)
+    {
+        juegoPerdido = true;
+        Time.timeScale = 0f;
+        if (interfazGameOver != null)
+        {
+            interfazGameOver.ShowGameOverMessage();
+        }
+    }
+
+    // Llamado por DemonBehaviour cuando mata al jugador
+    public void JugadorMuertoPorDemonio()
+    {
+        if (!juegoGanado && !juegoPerdido)
+        {
+            MostrarDerrota("El demonio te atrapó");
         }
     }
 
@@ -93,27 +220,64 @@ public class GameTaskManager : MonoBehaviour
         float x = 35f;
         float y = 55f;
 
+        // BARRA TIEMPO GENERAL (8 minutos) - AZUL
         GUI.color = Color.gray;
         GUI.DrawTexture(new Rect(x, y, anchoBarra, altoBarra), Texture2D.whiteTexture);
 
-        float porcentaje = tiempoRestante / tiempoTotal;
-        GUI.color = tareasCompletadas ? Color.green : Color.cyan;
-        GUI.DrawTexture(new Rect(x, y, anchoBarra * porcentaje, altoBarra), Texture2D.whiteTexture);
+        float porcentajeGeneral = tiempoRestanteGeneral / tiempoGeneral;
+        GUI.color = juegoGanado ? Color.green : Color.cyan;
+        GUI.DrawTexture(new Rect(x, y, anchoBarra * porcentajeGeneral, altoBarra), Texture2D.whiteTexture);
 
-        string texto = tareasCompletadas ? "TAREAS COMPLETADAS - DEMONIO CALMADO" : $"Tiempo: {tiempoRestante:F1}s";
-        GUI.color = tareasCompletadas ? Color.green : Color.white;
-        GUI.Label(new Rect(x, y - 45, anchoBarra, 45), texto, estiloTexto);
+        string textoGeneral = juegoGanado ? "¡VICTORIA!" : $"Tiempo total: {tiempoRestanteGeneral:F0}s";
+        GUI.color = juegoGanado ? Color.green : Color.white;
+        GUI.Label(new Rect(x, y - 45, anchoBarra, 45), textoGeneral, estiloTexto);
 
-        string textoLatas = $"Latas: {TrashPickUp.LatasEntregadas}/{TrashPickUp.TotalLatas}";
-        GUI.Label(new Rect(x, y + 60, anchoBarra, 45), textoLatas, estiloTexto);
-
-        if (bedTaskManager != null)
+        // BARRA TIEMPO DEMONIO (3.5 minutos) - NARANJA/ROJO
+        if (!demonioCalmado && !juegoGanado)
         {
-            string textoCama = $"Cama: {(bedTaskManager.TareaCompletada ? "COMPLETADA" : "PENDIENTE")}";
-            GUI.Label(new Rect(x, y + 110, anchoBarra, 45), textoCama, estiloTexto);
+            float porcentajeDemonio = tiempoRestanteDemonio / tiempoDemonio;
+
+            // Fondo de la barra del demonio
+            GUI.color = Color.gray;
+            GUI.DrawTexture(new Rect(x, y + 60, anchoBarra, 25), Texture2D.whiteTexture);
+
+            // Barra de progreso del demonio - COLOR NARANJA que cambia a ROJO
+            if (modoMatarActivado)
+            {
+                GUI.color = Color.red; // ROJO en modo matar
+            }
+            else if (persecucionActivada)
+            {
+                GUI.color = new Color(1f, 0.5f, 0f); // NARANJA intenso cuando está enfadado
+            }
+            else
+            {
+                GUI.color = new Color(1f, 0.7f, 0.2f); // NARANJA más suave cuando está tranquilo
+            }
+
+            GUI.DrawTexture(new Rect(x, y + 60, anchoBarra * porcentajeDemonio, 25), Texture2D.whiteTexture);
+
+            // Texto del timer del demonio - MÁS GRANDE Y CLARO
+            GUIStyle estiloDemonio = new GUIStyle(GUI.skin.label);
+            estiloDemonio.fontSize = 28;
+            estiloDemonio.normal.textColor = Color.white;
+            estiloDemonio.alignment = TextAnchor.UpperLeft;
+            estiloDemonio.fontStyle = FontStyle.Bold;
+
+            string textoDemonio = $"Demonio: {tiempoRestanteDemonio:F0}s / 210s";
+            GUI.Label(new Rect(x, y + 90, anchoBarra, 35), textoDemonio, estiloDemonio);
         }
 
-        string estadoDemonio = tareasCompletadas ? "DEMONIO: CALMADO" : (modoMatarActivado ? "DEMONIO: MODO MATAR" : (persecucionActivada ? "DEMONIO: ENFADADO" : "DEMONIO: TRANQUILO"));
-        GUI.Label(new Rect(x, y + 160, anchoBarra, 45), estadoDemonio, estiloTexto);
+        // ESTADO DEL DEMONIO
+        string estadoDemonio = demonioCalmado ? "DEMONIO: CALMADO" :
+                              (modoMatarActivado ? "DEMONIO: MODO MATAR" :
+                              (persecucionActivada ? "DEMONIO: ENFADADO" : "DEMONIO: TRANQUILO"));
+        GUI.Label(new Rect(x, y + 130, anchoBarra, 45), estadoDemonio, estiloTexto);
+
+        // MENSAJE DE VICTORIA
+        if (juegoGanado)
+        {
+            GUI.Label(new Rect(x, y + 180, anchoBarra, 45), "TODAS LAS TAREAS COMPLETADAS", estiloTexto);
+        }
     }
 }

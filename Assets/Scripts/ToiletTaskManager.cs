@@ -85,6 +85,8 @@ public class ToiletTaskManager : MonoBehaviour
         return true;
     }
 
+    public bool TareaCompletada => tareaCompletada;
+
     void OnGUI()
     {
         if (cerca && vaterActual != null && !vaterActual.EstaLimpio)

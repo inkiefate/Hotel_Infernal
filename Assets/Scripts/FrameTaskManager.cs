@@ -65,6 +65,8 @@ public class FrameTaskManager : MonoBehaviour
         return true;
     }
 
+    public bool TareaCompletada => tareaCompletada;
+
     void OnGUI()
 {
     if (cerca && cuadroActual != null && !cuadroActual.EstaRecto)

@@ -66,6 +66,8 @@ public class FaucetTaskManager : MonoBehaviour
         return true;
     }
 
+    public bool TareaCompletada => tareaCompletada;
+
     void OnGUI()
     {
         if (cerca && grifoActual != null && !grifoActual.EstaCerrado)

@@ -66,6 +66,9 @@ public class LampTaskManager : MonoBehaviour
         return true;
     }
 
+    public bool TareaCompletada => tareaCompletada;
+
+
     void OnGUI()
 {
     if (cerca && lamparaActual != null && !lamparaActual.EstaEncendida)

@@ -19714,6 +19714,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 239251638079152524, guid: 471ec89e5298b3c4f8725380cd6f559b, type: 3}
+      propertyPath: jugador
+      value: 
+      objectReference: {fileID: 1103801430}
+    - target: {fileID: 239251638079152524, guid: 471ec89e5298b3c4f8725380cd6f559b, type: 3}
+      propertyPath: camaraJugador
+      value: 
+      objectReference: {fileID: 1103801431}
+    - target: {fileID: 239251638079152524, guid: 471ec89e5298b3c4f8725380cd6f559b, type: 3}
+      propertyPath: interfazGameOver
+      value: 
+      objectReference: {fileID: 836499329}
     - target: {fileID: 8283034260407169360, guid: 471ec89e5298b3c4f8725380cd6f559b, type: 3}
       propertyPath: m_Name
       value: sk_monster_4
