@@ -366,8 +366,11 @@ public class GameTaskManager : MonoBehaviour
             estiloDemonio.alignment = TextAnchor.UpperLeft;
             estiloDemonio.fontStyle = FontStyle.Bold;
 
-            string textoDemonio = $"Demonio: {tiempoRestanteDemonio:F0}s / 210s";
-            GUI.Label(new Rect(x, y + 90, anchoBarra, 35), textoDemonio, estiloDemonio);
+            if (tiempoRestanteDemonio > 0)
+            {
+                string textoDemonio = $"Demonio: {tiempoRestanteDemonio:F0}s / 210s";
+                GUI.Label(new Rect(x, y + 90, anchoBarra, 35), textoDemonio, estiloDemonio);
+            }
         }
 
         // ESTADO DEL DEMONIO

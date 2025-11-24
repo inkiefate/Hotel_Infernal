@@ -24,7 +24,7 @@ public class FaucetTaskManager : MonoBehaviour
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 2f))
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 4f))
         {
             FaucetBehavior faucet = hit.collider.GetComponent<FaucetBehavior>();
             if (faucet != null && !faucet.EstaCerrado)
