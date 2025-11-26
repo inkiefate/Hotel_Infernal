@@ -13,6 +13,7 @@ public class menudiario : MonoBehaviour
     public GameObject confirmPopup;
     public GameObject[] minigamePanels;
     public GameObject[] taskCheckmarks;
+    public GameObject pocopersonalpopup;
 
     private int selectedTask = -1;
 
@@ -20,6 +21,7 @@ public class menudiario : MonoBehaviour
     {
         UpdateEnergyUI();
         confirmPopup.SetActive(false);
+        pocopersonalpopup.SetActive(false);
 
         foreach (var mini in minigamePanels)
             mini.SetActive(false);
@@ -32,7 +34,7 @@ public class menudiario : MonoBehaviour
     {
         if (currentPersonal < taskPersonalCost[taskIndex])
         {
-            Debug.Log("¡No queda personal disponible!");
+            pocopersonalpopup.SetActive(true);
             return;
         }
 
