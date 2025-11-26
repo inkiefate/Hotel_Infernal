@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class minijuegoaire : MonoBehaviour
 {
-    private bool terminado = false;
+  
 
     public GameObject popup;        // The popup of this minigame
     public Button taskButton;       // The task button in the menu
@@ -12,7 +12,7 @@ public class minijuegoaire : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            terminado = true;
+          
             FinalizarMinijuego();
         }
     }

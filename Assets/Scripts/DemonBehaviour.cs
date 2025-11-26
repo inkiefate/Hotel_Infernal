@@ -3,205 +3,134 @@ using UnityEngine.AI;
 
 public class DemonBehaviour : MonoBehaviour
 {
-    public Transform jugador;                     // Referencia al jugador
-    public GameOverUITMP interfazGameOver;        // Referencia a la interfaz de Game Over
-    public Transform[] puntosPatrulla;            // Lista de puntos por donde patrulla
+    public Transform jugador;
+    public Transform[] puntosPatrulla;
+    public GameOverUITMP interfazGameOver;
+    public InteractionDemon scriptInteraccion;
 
-    public float velocidadNormal = 5.5f;          // Velocidad cuando patrulla o persigue suave
-    public float velocidadMatar = 10f;            // Velocidad cuando esta en modo matar
-    public float distanciaMinima = 6f;            // Distancia a la que se detiene cuando no mata
+    private NavMeshAgent agente;
+    private bool enfadado = false;
+    private bool faseFinal = false;
 
-    private NavMeshAgent agente;                  // Componente de navegacion
-    private bool enfadado = false;                // Persigue sin matar
-    private bool faseFinal = false;               // Persigue para matar
-    private int puntoActual = -1;                 // Indice del punto de patrulla actual
-    private float tiempoAtascado = 0f;            // Tiempo que lleva atascado
-    private Vector3 ultimaPosicion;               // Para detectar si esta atascado
-    private float tiempoRecalculo = 0f;           // Control de recalculo de destino
+    public float distanciaMinima = 3f;
+    private float velocidadNormal;
 
     void Start()
     {
         agente = GetComponent<NavMeshAgent>();
-        agente.speed = velocidadNormal;
-        agente.stoppingDistance = distanciaMinima;
-        agente.acceleration = 8f;
-        agente.angularSpeed = 360f;              // Giro rapido para pasillos
-        agente.autoBraking = true;
-
-        // Evitacion de obstaculos de alta calidad
-        agente.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
-        agente.avoidancePriority = 50;
-        agente.radius = 0.4f;                    // Radio reducido para pasillos estrechos
-
-        ultimaPosicion = transform.position;
-
-        MoverAPuntoDePatrulla();
+        velocidadNormal = agente.speed;
+        IrAlSiguientePunto();
     }
 
     void Update()
     {
-        DetectarAtasco();
-
-        // Patrulla si esta tranquilo
         if (!enfadado && !faseFinal)
         {
-            if (!agente.pathPending && agente.remainingDistance <= agente.stoppingDistance)
-            {
-                MoverAPuntoDePatrulla();
-            }
-        }
-
-        // Persigue al jugador si esta enfadado o en fase final
-        if ((enfadado || faseFinal) && jugador != null)
-        {
-            tiempoRecalculo += Time.deltaTime;
-
-            // Recalcular destino cada medio segundo en vez de cada frame
-            if (tiempoRecalculo >= 0.5f)
-            {
-                agente.SetDestination(jugador.position);
-                tiempoRecalculo = 0f;
-            }
-        }
-    }
-
-    // Detectar si el agente esta atascado
-    void DetectarAtasco()
-    {
-        float distanciaRecorrida = Vector3.Distance(transform.position, ultimaPosicion);
-
-        if (distanciaRecorrida < 0.1f && agente.hasPath && !agente.isStopped)
-        {
-            tiempoAtascado += Time.deltaTime;
-
-            if (tiempoAtascado > 2f)
-            {
-                ResolverAtasco();
-            }
+            Patrullar();
         }
         else
         {
-            tiempoAtascado = 0f;
-        }
-
-        ultimaPosicion = transform.position;
-    }
-
-    void ResolverAtasco()
-    {
-        Debug.Log("Demonio atascado - recalculando ruta...");
-        agente.ResetPath();
-        Invoke("RecalcularRuta", 0.5f);
-        tiempoAtascado = 0f;
-    }
-
-    void RecalcularRuta()
-    {
-        if (enfadado || faseFinal)
-        {
-            if (jugador != null)
-            {
-                agente.SetDestination(jugador.position);
-            }
-        }
-        else
-        {
-            MoverAPuntoDePatrulla();
+            PerseguirJugador();
         }
     }
 
-    void MoverAPuntoDePatrulla()
-    {
-        if (puntosPatrulla == null || puntosPatrulla.Length == 0) return;
-
-        int nuevoIndice;
-        do
-        {
-            nuevoIndice = Random.Range(0, puntosPatrulla.Length);
-        }
-        while (nuevoIndice == puntoActual && puntosPatrulla.Length > 1);
-
-        puntoActual = nuevoIndice;
-
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(puntosPatrulla[puntoActual].position, out hit, 1f, NavMesh.AllAreas))
-        {
-            agente.SetDestination(hit.position);
-            Debug.Log($"Demonio patrullando hacia: {puntosPatrulla[puntoActual].name}");
-        }
-        else
-        {
-            Debug.LogWarning($"Punto de patrulla fuera del NavMesh: {puntosPatrulla[puntoActual].name}");
-        }
-    }
-
-    public void ActivarPersecucionSuave()
+    public void Enfadar()
     {
         enfadado = true;
-        faseFinal = false;
-        agente.speed = velocidadNormal;
-        agente.stoppingDistance = distanciaMinima;
-        agente.autoBraking = true;
-        agente.acceleration = 8f;
-        agente.angularSpeed = 360f;
-    }
-
-    public void ActivarModoMatar()
-    {
-        enfadado = false;
-        faseFinal = true;
-        agente.speed = velocidadMatar;
-        agente.stoppingDistance = 0f;
-        agente.autoBraking = false;
-        agente.acceleration = 12f;
-        agente.angularSpeed = 480f;
-
-        if (jugador != null)
-        {
-            agente.SetDestination(jugador.position);
-        }
-
-        Debug.Log("Demonio en modo matar: persecucion rapida directa.");
+        Debug.Log("El demonio se ha enfadado y comienza la persecución.");
     }
 
     public void Calmar()
     {
-        if (faseFinal) return;
-
         enfadado = false;
+        faseFinal = false;
         agente.speed = velocidadNormal;
-        agente.stoppingDistance = distanciaMinima;
-        agente.autoBraking = true;
-        agente.acceleration = 8f;
-        agente.angularSpeed = 360f;
-        MoverAPuntoDePatrulla();
+        agente.stoppingDistance = 0f;
+
+        Vector3 destinoAleatorio = GenerarDestinoAleatorio();
+        agente.SetDestination(destinoAleatorio);
+
+        Debug.Log("El demonio se ha calmado y vuelve a patrullar aleatoriamente.");
     }
 
-    void OnTriggerEnter(Collider other)
+    public void Teletransportarse()
     {
-        if (faseFinal && other.CompareTag("Player"))
+        Vector3 posicionJugador = jugador.position;
+        Vector3 direccionFrontal = jugador.forward;
+
+        Vector3 nuevaPosicion = posicionJugador + direccionFrontal * 1.5f;
+        transform.position = nuevaPosicion;
+        transform.LookAt(posicionJugador);
+
+        faseFinal = true;
+        agente.stoppingDistance = 0f;
+        agente.speed = 8f;
+        agente.SetDestination(jugador.position);
+    }
+
+
+    void Patrullar()
+    {
+        if (!agente.hasPath || agente.remainingDistance < 0.5f)
         {
-            if (interfazGameOver != null)
-            {
-                interfazGameOver.ShowGameOverMessage();
-                Time.timeScale = 0f;
-                Debug.Log("El demonio ha atrapado al jugador en modo matar.");
-            }
+            Vector3 destinoAleatorio = GenerarDestinoAleatorio();
+            agente.SetDestination(destinoAleatorio);
         }
     }
 
-    void OnDrawGizmos()
+    Vector3 GenerarDestinoAleatorio()
     {
-        if (agente != null && agente.hasPath)
-        {
-            Gizmos.color = Color.red;
-            for (int i = 0; i < agente.path.corners.Length - 1; i++)
-            {
-                Gizmos.DrawLine(agente.path.corners[i], agente.path.corners[i + 1]);
-            }
+        float rango = 10f;
+        Vector3 centro = transform.position;
 
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(agente.destination, 0.5f);
+        Vector3 puntoAleatorio = centro + new Vector3(
+            Random.Range(-rango, rango),
+            0,
+            Random.Range(-rango, rango)
+        );
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(puntoAleatorio, out hit, 2f, NavMesh.AllAreas))
+        {
+            return hit.position;
+        }
+
+        return transform.position;
+    }
+
+    void IrAlSiguientePunto()
+    {
+        if (puntosPatrulla.Length > 0)
+        {
+            agente.SetDestination(puntosPatrulla[0].position);
+        }
+    }
+
+    void PerseguirJugador()
+    {
+        if (jugador == null) return;
+
+        if (faseFinal)
+        {
+            agente.stoppingDistance = 0f;
+            agente.speed = 8f;
+        }
+        else
+        {
+            agente.stoppingDistance = distanciaMinima;
+            agente.speed = velocidadNormal;
+        }
+
+        agente.SetDestination(jugador.position);
+    }
+
+
+    void OnTriggerEnter(Collider otro)
+    {
+        if (otro.CompareTag("Player") && scriptInteraccion.EstaEnFaseFinal())
+        {
+            interfazGameOver.ShowGameOverMessage();
+            Debug.Log("El demonio ha matado al jugador.");
         }
     }
 }

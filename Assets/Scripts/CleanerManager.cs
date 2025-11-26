@@ -1,27 +1,29 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// Administrador que controla la limpieza de varios cubos "limpiables"
 public class CleanerManager : MonoBehaviour
 {
-    public Camera playerCamera;                   // Cámara del jugador
-    public GameObject[] cubosLimpiables;          // Lista de cubos limpiables
-    public PlayerMovement playerMovement;         // Referencia al jugador
+    public float tiempoLimite = 80f;
+    public float tiempoReinicio = 60f;
+    public Camera playerCamera;
+    public GameObject[] cubosLimpiables;
 
-    private Dictionary<GameObject, int> interacciones = new Dictionary<GameObject, int>(); // Conteo de interacciones
-    private GameObject cuboActual;                // Cubo que el jugador está mirando
-    private bool cerca = false;                   // Si el jugador está cerca mirando un cubo
-    private bool limpiezaCompletada = false;      // Si todas las tareas de limpieza han terminado
+    private Dictionary<GameObject, int> interacciones = new Dictionary<GameObject, int>();
+    private float temporizador;
+    private float tiempoEspera;
+    private bool limpiezaActiva = true;
+    private GameObject cuboActual;
+    private bool cerca = false;
 
     void Start()
     {
-        // Inicializa cada cubo
+        temporizador = tiempoLimite;
+
         foreach (GameObject cubo in cubosLimpiables)
         {
             cubo.SetActive(true);
             interacciones[cubo] = 0;
 
-            // Asegurar que cada cubo tenga el comportamiento de limpieza
             if (!cubo.TryGetComponent(out CleanerBehavior behavior))
                 cubo.AddComponent<CleanerBehavior>();
         }
@@ -29,17 +31,6 @@ public class CleanerManager : MonoBehaviour
 
     void Update()
     {
-        if (limpiezaCompletada) return;
-
-        // Bloqueo: si el jugador lleva un objeto, no puede limpiar
-        if (playerMovement != null && playerMovement.EstaLlevandoObjeto)
-        {
-            cerca = false;
-            cuboActual = null;
-            return;
-        }
-
-        // Detectar cubo con raycast
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 2f))
         {
@@ -58,32 +49,50 @@ public class CleanerManager : MonoBehaviour
             cerca = false;
         }
 
-        // Interactuar con cubo
-        if (cerca && Input.GetKeyDown(KeyCode.E) && cuboActual != null)
+        if (limpiezaActiva)
         {
-            if (interacciones.ContainsKey(cuboActual))
+            temporizador -= Time.deltaTime;
+
+            if (cerca && Input.GetKeyDown(KeyCode.E) && cuboActual != null)
             {
-                interacciones[cuboActual]++;
-                Debug.Log("Cubo " + cuboActual.name + ": " + interacciones[cuboActual] + " interacciones.");
-
-                // Después de 3 interacciones, desactivar el cubo
-                if (interacciones[cuboActual] >= 3)
+                if (interacciones.ContainsKey(cuboActual))
                 {
-                    cuboActual.SetActive(false);
-                    interacciones[cuboActual] = 0;
-                }
+                    interacciones[cuboActual]++;
+                    Debug.Log($"Cubo {cuboActual.name}: {interacciones[cuboActual]} interacciones.");
 
-                // Verificar si todos los cubos están desactivados
-                if (TodosCubosDesactivados())
-                {
-                    limpiezaCompletada = true;
-                    Debug.Log("Tarea de limpieza completada.");
+                    if (interacciones[cuboActual] >= 3)
+                    {
+                        cuboActual.SetActive(false);
+                        interacciones[cuboActual] = 0;
+                    }
+
+                    if (TodosCubosDesactivados())
+                    {
+                        limpiezaActiva = false;
+                        tiempoEspera = tiempoReinicio;
+                        Debug.Log("¡Todos los cubos han sido limpiados!");
+                    }
                 }
+            }
+
+            if (temporizador <= 0f)
+            {
+                limpiezaActiva = false;
+                tiempoEspera = tiempoReinicio;
+                Debug.Log("¡Tiempo agotado! Los cubos reaparecerán en 1 minuto.");
+            }
+        }
+        else
+        {
+            tiempoEspera -= Time.deltaTime;
+
+            if (tiempoEspera <= 0f)
+            {
+                ReiniciarCiclo();
             }
         }
     }
 
-    // Revisar si todos los cubos están desactivados
     bool TodosCubosDesactivados()
     {
         foreach (GameObject cubo in cubosLimpiables)
@@ -94,26 +103,54 @@ public class CleanerManager : MonoBehaviour
         return true;
     }
 
-    // Propiedad para verificar si la limpieza está completada
-    public bool LimpiezaCompletada => limpiezaCompletada;
-
-    // Método para verificar si la tarea está completada
-    public bool TareaCompletada()
+    void ReiniciarCiclo()
     {
-        return limpiezaCompletada;
+        foreach (GameObject cubo in cubosLimpiables)
+        {
+            cubo.SetActive(true);
+            interacciones[cubo] = 0;
+        }
+
+        temporizador = tiempoLimite;
+        limpiezaActiva = true;
+        Debug.Log("¡Los cubos han reaparecido! Comienza un nuevo ciclo.");
     }
 
-    // GUI para mostrar mensaje en pantalla
     void OnGUI()
+{
+    GUIStyle estiloTexto = new GUIStyle(GUI.skin.label);
+    estiloTexto.fontSize = 20;
+    estiloTexto.normal.textColor = Color.white;
+    estiloTexto.alignment = TextAnchor.UpperCenter;
+
+    float anchoBarra = 300f;
+    float altoBarra = 25f;
+    float x = Screen.width / 2 - anchoBarra / 2;
+    float y = 60f;
+
+    // Fondo de la barra
+    GUI.color = Color.gray;
+    GUI.DrawTexture(new Rect(x, y, anchoBarra, altoBarra), Texture2D.whiteTexture);
+
+    // Barra de progreso
+    float porcentaje = limpiezaActiva ? temporizador / tiempoLimite : tiempoEspera / tiempoReinicio;
+    GUI.color = limpiezaActiva ? Color.green : Color.red;
+    GUI.DrawTexture(new Rect(x, y, anchoBarra * porcentaje, altoBarra), Texture2D.whiteTexture);
+
+    // Texto encima de la barra
+    string texto = limpiezaActiva
+        ? $"Tiempo restante: {temporizador:F1}s"
+        : $"Reinicio en: {tiempoEspera:F1}s";
+
+    GUI.color = Color.white;
+    GUI.Label(new Rect(x, y - 30, anchoBarra, 30), texto, estiloTexto);
+
+    // Mensaje de interacción
+    if (cerca && limpiezaActiva)
     {
-        if (cerca && !limpiezaCompletada && cuboActual != null)
-        {
-            GUIStyle estilo = new GUIStyle(GUI.skin.label);
-            estilo.fontSize = 40;
-            estilo.normal.textColor = Color.white;
-            estilo.alignment = TextAnchor.MiddleCenter;
-            Rect mensaje = new Rect(Screen.width / 2 - 200, Screen.height - 120, 400, 80);
-            GUI.Label(mensaje, "Pulsa E para interaccionar", estilo);
-        }
+        Rect mensaje = new Rect(Screen.width / 2 - 150, Screen.height - 100, 300, 50);
+        GUI.Label(mensaje, "Presiona E para limpiar cubo", estiloTexto);
     }
 }
+}
+
