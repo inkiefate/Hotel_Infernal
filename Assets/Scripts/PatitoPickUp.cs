@@ -10,6 +10,9 @@ public class PatitoPickup : MonoBehaviour
     public float radioInteraccion = 0.5f;         // Radio del SphereCast
     public float distanciaInteraccion = 3.5f;     // Distancia máxima de interacción
 
+    [Header("UI Visual del patito")]
+    public GameObject patitoUI;                   // Imagen PNG en el Canvas que simula el patito
+
     private bool recogido = false;                // Si el patito ya fue recogido
     private bool entregado = false;               // Si ya se entregó
     private bool cerca = false;                   // Si estamos mirando el patito
@@ -23,6 +26,8 @@ public class PatitoPickup : MonoBehaviour
     {
         // Contar este patito en el total
         totalPatitos++;
+        if (patitoUI != null)
+            patitoUI.SetActive(false); // aseguramos que empieza oculto
     }
 
     void Update()
@@ -36,13 +41,16 @@ public class PatitoPickup : MonoBehaviour
             recogido = true;
             playerMovement.LlevarObjeto(true, false);
 
-            // Colocar en mano del jugador
-            transform.SetParent(patitoAnchor);
-            transform.localPosition = new Vector3(0, -0.4f, 0);
-            transform.localRotation = Quaternion.identity;
-            transform.localScale = Vector3.one * 0.5f;
+            // Mostrar imagen PNG en pantalla
+            if (patitoUI != null)
+                patitoUI.SetActive(true);
+
+            // Ocultar solo el modelo visual (no el GameObject entero)
+            foreach (var r in GetComponentsInChildren<MeshRenderer>())
+                r.enabled = false;
 
             GetComponent<Collider>().enabled = false;
+
             Debug.Log("Patito recogido");
         }
 
@@ -57,7 +65,10 @@ public class PatitoPickup : MonoBehaviour
                 entregado = true;
                 patitosEntregados++; // Contar patito entregado
                 playerMovement.SoltarObjeto();
-                gameObject.SetActive(false);
+
+                // Ocultar imagen PNG
+                if (patitoUI != null)
+                    patitoUI.SetActive(false);
 
                 // Instanciar prefab visual en la bañera
                 if (patitoVisualPrefab != null && puntoColocacion != null)
@@ -120,4 +131,5 @@ public class PatitoPickup : MonoBehaviour
             GUI.Label(mensaje, "Pulsa E para entregar patito", estilo);
     }
 }
+
 
